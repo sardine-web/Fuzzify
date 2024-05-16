@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Function to check if ffuf is installed
+check_ffuf() {
+    if ! command -v ffuf &> /dev/null; then
+        echo "ffuf is not installed. Installing..."
+        # Check if Go compiler is installed
+        if ! command -v go &> /dev/null; then
+            echo "Go compiler is not installed. Please install Go first."
+            exit 1
+        fi
+        # Install or update ffuf using Go
+        go install github.com/ffuf/ffuf/v2@latest
+    else
+        echo "ffuf is already installed."
+    fi
+}
+
+# Call the function to check and install ffuf
+check_ffuf
+
+# Now run your ffuf command
+fileName="fuzzingResult_$(date +'%m-%d-%Y_%H-%M-%S').csv"
+cookies=$(<cookies.txt)
+
+ffuf -X GET -u 'http://www.target.com/api/v1.0/W1' \
+-request  './generalHeaders.txt' \
+-w 'D:\Obsidian\Methodology\word-lists\IIS.fuzz.txt.md:W1' \
+-enc 'W1:urlencode' \
+-b "$cookies" \
+-o "$fileName" -of csv -v
